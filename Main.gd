@@ -25,6 +25,8 @@ var pos = 0
 var count = 0
 var bonus = 0
 
+var shut_up
+
 func _ready():
 	gui = $GUI
 	gui.connect("button_pressed", self, "_button_pressed")
@@ -159,6 +161,8 @@ func _start_game():
 func new_shape():
 	if next_shape:
 		shape = next_shape
+		if _sound_is_on() and !shut_up:
+			$PiecePlaced.play()
 	else:
 		shape = Shapes.get_shape()
 	next_shape = Shapes.get_shape()
@@ -323,11 +327,13 @@ func check_rows():
 
 
 func remove_rows(rows):
+		shut_up = true
 		var rows_moved = 0
 		add_to_score(rows.size())
 		pause()
 		if _sound_is_on():
 			$SoundPlayer.play()
+			$LineCleared.play()
 		yield(get_tree().create_timer(0.3), "timeout")
 		pause(false)
 		remove_shape_from_grid()
@@ -348,6 +354,7 @@ func remove_rows(rows):
 				to -= 1
 			rows_moved += 1
 		add_shape_to_grid()
+		shut_up = false
 
 
 func pause(value = true):
